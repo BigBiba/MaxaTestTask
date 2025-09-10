@@ -1,0 +1,107 @@
+<div style="
+  max-width: 350px; 
+  margin: 50px auto;
+  text-align: center;
+  background: #fafafa;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 3px 12px #0001;
+">
+  <h2 style="font-weight:500; margin-bottom:20px;">Generate PDF from SVG</h2>
+
+  <%= form_with url: documents_path, html: { multipart: true, id: "svg-upload-form" } do |f| %>
+    <label for="svg_file" style="
+      display: inline-block;
+      cursor: pointer;
+      padding: 8px 25px;
+      background: #f3f3f3;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-weight: 500;
+      border: 1px solid #ddd;
+    ">
+      Upload SVG
+      <%= f.file_field :svg_file, id: "svg_file", style: "display:none;" %>
+    </label>
+
+    <%= f.submit "Export PDF", style: "
+      padding: 12px 24px;
+      font-size: 17px;
+      background: #222;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 10px;
+    " %>
+  <% end %>
+
+  <div id="upload-preview" style="
+      margin: 0 auto 24px;
+      width: 200px; height: 100px;
+      display: flex; align-items: center; justify-content: center;
+      background: #fff; border: 1px solid #eee; border-radius: 12px;
+    ">
+    <span style="color:#aaa; font-size:22px;">No SVG uploaded</span>
+  </div>
+
+  <div id="pdf-download" style="display:none; margin-bottom:10px;">
+    <a id="pdf-link" class="btn btn-success btn-lg" download>Download PDF</a>
+  </div>
+
+  <div id="alert-message" class="alert alert-warning" style="display:none;">
+    PDF is not ready yet. Please try again later.
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const form = document.getElementById("svg-upload-form");
+  const preview = document.getElementById("upload-preview");
+  const downloadBlock = document.getElementById("pdf-download");
+  const pdfLink = document.getElementById("pdf-link");
+  const alertMsg = document.getElementById("alert-message");
+
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+    var formData = new FormData(form);
+
+    preview.innerHTML = '<span style="color:#888; font-size:22px;">Загрузка...</span>';
+    downloadBlock.style.display = "none";
+    alertMsg.style.display = "none";
+
+    fetch(form.action, {
+      method: "POST",
+      body: formData,
+      headers: {
+        'Accept': 'application/json'
+      }
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.pdf_url) {
+        preview.innerHTML = '<span style="display:inline-block;width:64px;height:64px;border-radius:50%;background:#97979755;line-height:64px;font-size:44px;color:#fff;">✓</span>';
+        pdfLink.href = data.pdf_url;
+        downloadBlock.style.display = "block";
+        alertMsg.style.display = "none";
+      } else {
+        preview.innerHTML = '<span style="color:#aaa; font-size:22px;">Ошибка экспорта</span>';
+        downloadBlock.style.display = "none";
+        alertMsg.textContent = "PDF is not ready yet. Please try again later.";
+        alertMsg.style.display = "block";
+      }
+    })
+    .catch(() => {
+      preview.innerHTML = '<span style="color:#aaa; font-size:22px;">Upload failed</span>';
+      downloadBlock.style.display = "none";
+      alertMsg.textContent = "Ошибка связи с сервером.";
+      alertMsg.style.display = "block";
+    });
+  });
+
+  document.getElementById("svg_file").addEventListener("change", function(e) {
+    preview.innerHTML = '<span style="color:#4a7bae; font-size:22px;">SVG выбран</span>';
+  });
+});
+</script>
