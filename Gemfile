@@ -66,8 +66,6 @@ gem "mini_magick", "~> 5.3"
 
 gem "prawn", "~> 2.5"
 
-gem "react-rails", "~> 3.2"
-
 gem "prawn-svg", "~> 0.38.0"
 
 gem "blueprint", "~> 0.2.0"
