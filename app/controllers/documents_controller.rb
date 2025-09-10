@@ -4,7 +4,7 @@ class DocumentsController < ApplicationController
 
     def create
         unless params[:svg_file].present?
-            render json: DocumentBlueprint.render(
+            return render json: DocumentBlueprint.render(
                 {
                     error: "SVG file required",
                     message: "Please upload valid SVG file"
