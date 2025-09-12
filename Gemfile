@@ -75,4 +75,4 @@ gem "prawn-svg", "~> 0.38.0"
 
 gem "blueprint", "~> 0.2.0"
 
-gem "blueprinter", "~> 1.1"
+gem "blueprinter", "~> 1.2"
